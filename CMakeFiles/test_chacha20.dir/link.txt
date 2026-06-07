@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/test_chacha20.dir/link.d CMakeFiles/test_chacha20.dir/test/test_chacha20.cpp.o CMakeFiles/test_chacha20.dir/src/crypto/chacha20.cpp.o CMakeFiles/test_chacha20.dir/src/crypto/key_manager.cpp.o -o test_chacha20  /usr/lib/libcrypto.so

@@ -1,0 +1,6 @@
+/home/ngquanghuy/Security/CMakeFiles/Security.dir
+/home/ngquanghuy/Security/CMakeFiles/test_encoders.dir
+/home/ngquanghuy/Security/CMakeFiles/test_chacha20.dir
+/home/ngquanghuy/Security/CMakeFiles/test.dir
+/home/ngquanghuy/Security/CMakeFiles/edit_cache.dir
+/home/ngquanghuy/Security/CMakeFiles/rebuild_cache.dir
