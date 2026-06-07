@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME}
     src/encoders/base36.cpp
     src/crypto/chacha20.cpp
     src/crypto/key_manager.cpp
+    src/crypto/poly1305.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -51,3 +52,18 @@ target_include_directories(test_chacha20 PRIVATE
 target_link_libraries(test_chacha20 PRIVATE OpenSSL::Crypto)
 
 add_test(NAME ChaCha20 COMMAND test_chacha20)
+
+add_executable(test_chacha20poly1305
+    test/test_chacha20poly1305.cpp
+    src/crypto/poly1305.cpp
+    src/crypto/chacha20.cpp
+    src/crypto/key_manager.cpp
+)
+
+target_include_directories(test_chacha20poly1305 PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(test_chacha20poly1305 PRIVATE OpenSSL::Crypto)
+
+add_test(NAME ChaCha20Poly1305 COMMAND test_chacha20poly1305)
