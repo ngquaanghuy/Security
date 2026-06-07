@@ -7,4 +7,6 @@ namespace encoders {
 
 std::string base85_encode(std::string_view data);
 
+std::string base85_decode(std::string_view data);
+
 } // namespace encoders

@@ -42,4 +42,54 @@ std::string base85_encode(std::string_view data) {
     return result;
 }
 
+std::string base85_decode(std::string_view data) {
+    if (data.empty()) return {};
+
+    std::string result;
+    result.reserve(data.size());
+
+    size_t i = 0;
+    while (i < data.size()) {
+        if (data[i] <= ' ') { ++i; continue; }
+
+        if (data[i] == 'z') {
+            result.append(4, '\0');
+            ++i;
+            continue;
+        }
+
+        uint32_t value = 0;
+        size_t count = 0;
+        while (count < 5 && i < data.size()) {
+            char c = data[i];
+            if (c <= ' ') { ++i; continue; }
+            if (c == 'z') break;
+            if (c < 33 || c > 117) { ++i; continue; }
+            value = value * 85 + (static_cast<uint8_t>(c) - 33);
+            ++count;
+            ++i;
+        }
+
+        if (count < 2) continue;
+
+        size_t output_bytes = count - 1;
+
+        // Pad partial group with 'u' (value 84) to get full 32-bit value
+        while (count < 5) {
+            value = value * 85 + 84;
+            ++count;
+        }
+
+        uint8_t bytes[4];
+        bytes[0] = static_cast<uint8_t>((value >> 24) & 0xFF);
+        bytes[1] = static_cast<uint8_t>((value >> 16) & 0xFF);
+        bytes[2] = static_cast<uint8_t>((value >> 8) & 0xFF);
+        bytes[3] = static_cast<uint8_t>(value & 0xFF);
+
+        result.append(reinterpret_cast<const char*>(bytes), output_bytes);
+    }
+
+    return result;
+}
+
 } // namespace encoders
