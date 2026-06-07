@@ -39,8 +39,9 @@ static void print_help() {
     std::printf("  Encoding:   base64, base85, base32, base36\n");
     std::printf("  Encryption: chacha20, chacha20-poly1305\n");
     std::printf("\nExamples:\n");
-    std::printf("  %s                                       Generate key\n", PROJECT_NAME);
-    std::printf("  %s -a chacha20 -o key.txt               Generate key, save to file\n", PROJECT_NAME);
+    std::printf("  %s -h                                   Show help\n", PROJECT_NAME);
+    std::printf("  %s --keygen                             Generate key\n", PROJECT_NAME);
+    std::printf("  %s -a chacha20 --keygen -o key.txt      Generate key, save to file\n", PROJECT_NAME);
     std::printf("  %s -a chacha20 --keyenv -f plain -o enc Encrypt file\n", PROJECT_NAME);
     std::printf("  %s --keyfile key.bin -a chacha20 -d -f enc -o out  Decrypt\n", PROJECT_NAME);
 }
@@ -134,9 +135,13 @@ static std::string make_chacha20_poly1305_wrapper(const std::string& encrypted,
     std::string w;
     w += "#!/usr/bin/env python3\n";
     w += "import base64, os, subprocess, sys, tempfile\n";
+    w += "try:\n";
+    w += "    from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305\n";
+    w += "except ImportError:\n";
+    w += "    sys.exit(\"Error: python3-cryptography not installed\")\n";
     w += "data_b64 = \"\"\""; w += b64; w += "\"\"\"\n";
     w += "raw = base64.b64decode(data_b64)\n";
-    w += "nonce_hex = raw[:12].hex()\n";
+    w += "nonce = raw[:12]\n";
     w += "ct_and_tag = raw[12:]\n";
 
     if (key_source == "gen") {
@@ -153,14 +158,11 @@ static std::string make_chacha20_poly1305_wrapper(const std::string& encrypted,
         w += "    sys.exit(f\"Error: cannot read key file: {e}\")\n";
     }
 
-    w += "proc = subprocess.run(\n";
-    w += "    [\"openssl\", \"enc\", \"-chacha20-poly1305\", \"-d\",\n";
-    w += "     \"-K\", key_hex, \"-iv\", nonce_hex],\n";
-    w += "    input=ct_and_tag, capture_output=True)\n";
-    w += "if proc.returncode != 0:\n";
-    w += "    sys.exit(\"Error: decryption failed\")\n";
+    w += "key = bytes.fromhex(key_hex)\n";
+    w += "chacha = ChaCha20Poly1305(key)\n";
+    w += "plaintext = chacha.decrypt(nonce, ct_and_tag, None)\n";
     w += "f, p = tempfile.mkstemp()\n";
-    w += "os.write(f, proc.stdout)\n";
+    w += "os.write(f, plaintext)\n";
     w += "os.close(f)\n";
     w += "os.chmod(p, 0o755)\n";
     w += "try:\n";
@@ -223,8 +225,7 @@ static std::string make_chacha20_wrapper(const std::string& encrypted,
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        crypto::Key key = crypto::generate_key();
-        std::printf("%s\n", crypto::key_to_hex(key).c_str());
+        print_help();
         return 0;
     }
 
@@ -458,14 +459,17 @@ int main(int argc, char* argv[]) {
         }
 
         if (!output_path.empty()) {
+            std::string wrapper;
             if (algorithm == "chacha20-poly1305") {
-                if (!write_file(std::string(output_path), output)) {
-                    std::fprintf(stderr, "Error: cannot write to '%s'\n",
-                                 std::string(output_path).c_str());
-                    return 1;
+                if (key_mode == KEYMODE_ENV) {
+                    wrapper = make_chacha20_poly1305_wrapper(output, "env", "");
+                } else if (key_mode == KEYMODE_FILE) {
+                    std::string kp = keyfile_path.empty() ? ".key" : keyfile_path;
+                    wrapper = make_chacha20_poly1305_wrapper(output, "file", kp);
+                } else {
+                    wrapper = make_chacha20_poly1305_wrapper(output, "gen", key_hex_for_wrapper);
                 }
             } else {
-                std::string wrapper;
                 if (key_mode == KEYMODE_ENV) {
                     wrapper = make_chacha20_wrapper(output, "env", "");
                 } else if (key_mode == KEYMODE_FILE) {
@@ -474,15 +478,15 @@ int main(int argc, char* argv[]) {
                 } else {
                     wrapper = make_chacha20_wrapper(output, "gen", key_hex_for_wrapper);
                 }
-
-                if (!write_file(std::string(output_path), wrapper)) {
-                    std::fprintf(stderr, "Error: cannot write to '%s'\n",
-                                 std::string(output_path).c_str());
-                    return 1;
-                }
-                set_file_mode(std::string(output_path),
-                              get_file_mode(std::string(output_path)) | EXEC_BITS);
             }
+
+            if (!write_file(std::string(output_path), wrapper)) {
+                std::fprintf(stderr, "Error: cannot write to '%s'\n",
+                             std::string(output_path).c_str());
+                return 1;
+            }
+            set_file_mode(std::string(output_path),
+                          get_file_mode(std::string(output_path)) | EXEC_BITS);
         } else {
             std::printf("%s\n", output.c_str());
         }
