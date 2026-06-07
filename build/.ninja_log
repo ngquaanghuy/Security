@@ -1,0 +1,20 @@
+# ninja log v7
+2	459	1780808452134130537	CMakeFiles/Security.dir/src/main.cpp.o	fb9f42fe737b9f1d
+1	627	1780807563787933723	CMakeFiles/Security.dir/src/encoders/base36.cpp.o	dc85c14c1584988d
+1	235	1780807596971817000	CMakeFiles/test_encoders.dir/test/test_encoders.cpp.o	b9c6deb9a1830ac4
+1	594	1780807563787647920	CMakeFiles/Security.dir/src/encoders/base85.cpp.o	5ae7cd98160208de
+6	400	1780807563793243823	CMakeFiles/test_encoders.dir/src/encoders/base85.cpp.o	41aaac4888a5ce28
+11	536	1780807563796570296	CMakeFiles/test_encoders.dir/src/encoders/base36.cpp.o	5b3d6ad8f75fbe2c
+1	702	1780807563787805135	CMakeFiles/Security.dir/src/encoders/base32.cpp.o	d092fe0e71905784
+7	541	1780807563793423215	CMakeFiles/test_encoders.dir/src/encoders/base32.cpp.o	445ab1c7dd52d169
+4	715	1780807563790570438	CMakeFiles/test_encoders.dir/src/encoders/base64.cpp.o	e50bc61bd016719e
+1	473	1780807563786570532	CMakeFiles/Security.dir/src/encoders/base64.cpp.o	a3423742619537
+460	550	1780808452592118878	Security	62d57b82b8b5b2cb
+235	316	1780807597205811876	test_encoders	67474954a85dc519
+0	5	1780807563756571238	clean	7adf74806070bde8
+1	469	1780808815135285458	CMakeFiles/Security.dir/src/main.cpp.o	fb9f42fe737b9f1d
+469	610	1780808815603276771	Security	62d57b82b8b5b2cb
+1	499	1780808838851848719	CMakeFiles/Security.dir/src/main.cpp.o	fb9f42fe737b9f1d
+499	596	1780808839349839626	Security	62d57b82b8b5b2cb
+1	455	1780808867726326450	CMakeFiles/Security.dir/src/main.cpp.o	fb9f42fe737b9f1d
+455	545	1780808868180318318	Security	62d57b82b8b5b2cb
