@@ -71,27 +71,41 @@ static void test_base32() {
 static void test_base36() {
     TEST("base36 encode empty", encoders::base36_encode("") == "");
     TEST("base36 encode zero byte",
-         encoders::base36_encode(std::string_view("\0", 1)) == "0");
+         encoders::base36_encode(std::string_view("\0", 1)) == "00======");
     TEST("base36 encode two zeros",
-         encoders::base36_encode(std::string_view("\0\0", 2)) == "00");
+         encoders::base36_encode(std::string_view("\0\0", 2)) == "0000====");
     TEST("base36 encode 0xFF",
-         encoders::base36_encode(std::string_view("\xFF", 1)) == "73");
+         encoders::base36_encode(std::string_view("\xFF", 1)) == "73======");
     TEST("base36 encode 0x00FF",
-         encoders::base36_encode(std::string_view("\x00\xFF", 2)) == "073");
+         encoders::base36_encode(std::string_view("\x00\xFF", 2)) == "0073====");
     TEST("base36 encode hello",
          encoders::base36_encode("hello") == "5PZCSZU7");
     TEST("base36 encode 123",
-         encoders::base36_encode("123") == "1X3QR");
+         encoders::base36_encode("123") == "1X3QR===");
 
     TEST("base36 decode empty", encoders::base36_decode("") == "");
-    TEST("base36 decode 0", encoders::base36_decode("0") == std::string_view("\0", 1));
-    TEST("base36 decode 00", encoders::base36_decode("00") == std::string_view("\0\0", 2));
-    TEST("base36 decode 73", encoders::base36_decode("73") == std::string_view("\xFF", 1));
-    TEST("base36 decode 073", encoders::base36_decode("073") == std::string_view("\x00\xFF", 2));
-    TEST("base36 decode 5PZCSZU7", encoders::base36_decode("5PZCSZU7") == "hello");
-    TEST("base36 decode 1X3QR", encoders::base36_decode("1X3QR") == "123");
+    TEST("base36 decode padded zero byte",
+         encoders::base36_decode("00======") == std::string_view("\0", 1));
+    TEST("base36 decode zero byte unpadded",
+         encoders::base36_decode("00") == std::string_view("\0", 1));
+    TEST("base36 decode two zeros",
+         encoders::base36_decode("0000====") == std::string_view("\0\0", 2));
+    TEST("base36 decode 0xFF",
+         encoders::base36_decode("73======") == std::string_view("\xFF", 1));
+    TEST("base36 decode 0xFF unpadded",
+         encoders::base36_decode("73") == std::string_view("\xFF", 1));
+    TEST("base36 decode 0x00FF",
+         encoders::base36_decode("0073====") == std::string_view("\x00\xFF", 2));
+    TEST("base36 decode 5PZCSZU7",
+         encoders::base36_decode("5PZCSZU7") == "hello");
+    TEST("base36 decode 123",
+         encoders::base36_decode("1X3QR===") == "123");
+    TEST("base36 decode 123 unpadded",
+         encoders::base36_decode("1X3QR") == "123");
     TEST("base36 decode roundtrip",
          encoders::base36_decode(encoders::base36_encode("Hello World!")) == "Hello World!");
+    TEST("base36 decode roundtrip binary",
+         encoders::base36_decode(encoders::base36_encode(std::string_view("\x00\x01\x02\xFF\xFE\xFD\x00\xFF", 8))) == std::string_view("\x00\x01\x02\xFF\xFE\xFD\x00\xFF", 8));
 }
 
 static void test_base85() {
