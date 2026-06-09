@@ -1,0 +1,44 @@
+PROJECT_STATUS
+==============
+Security - C++ CLI Security Tool
+Last updated: 2026-06-08
+
+OVERVIEW
+--------
+A CLI tool providing encoding (Base64, Base85, Base32, Base36) and
+encryption (ChaCha20-Poly1305) with multiple key-source options:
+--keygen (default), --keyenv, --keyfile, and -k.
+
+BUILD STATUS
+------------
+- Build: Passes cleanly, no warnings (CMake + Ninja)
+- Tests: 3/3 pass (Encoders, ChaCha20, ChaCha20Poly1305)
+- Last verified: 15 consecutive runs all pass (2026-06-08)
+
+COMPLETED FEATURES
+------------------
+1. Encoding: Base64, Base85, Base32, Base36
+2. Encryption/Decryption: ChaCha20-Poly1305 (OpenSSL)
+3. Key management:
+   - Random key generation (--keygen)
+   - Key from environment variable (--keyenv)
+   - Key from file (--keyfile, raw binary or hex)
+   - Key from hex string (-k)
+    - All mutually exclusive; default --keygen for all commands
+4. CLI: Self-executing wrapper script output (-o)
+5. CLI: File input mode (-f)
+6. CLI: Algorithm selection (-a)
+7. CLI: Decrypt mode (-d alias for decode)
+8. Mutual exclusivity validation for key source flags
+9. Proper error messages for missing env/file, invalid key sources
+10. Protect command: encrypt + wrap into self-executing Python script
+11. Protect wrapper: supports all 6 algorithms (chacha20/cli for chacha20,
+    cryptography lib for chacha20-poly1305, stdlib for base64/85/32/36)
+
+UPCOMING / IN PROGRESS
+----------------------
+- (none)
+
+KNOWN ISSUES
+------------
+- (none)
